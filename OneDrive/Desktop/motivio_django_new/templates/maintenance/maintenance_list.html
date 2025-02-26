@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block title %}Maintenance History - Motivio{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2 mb-0 text-primary">Maintenance History</h1>
+    <div>
+        {% if vehicles %}
+            <a href="{% url 'maintenance-create' vehicles.first.pk %}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-1"></i> Add Record
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Filter Controls -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label for="vehicleFilter" class="form-label">Filter by Vehicle</label>
+                <select name="vehicle" id="vehicleFilter" class="form-select">
+                    <option value="">All Vehicles</option>
+                    {% for v in vehicles %}
+                        <option value="{{ v.id }}" {% if selected_vehicle == v.id|stringformat:"s" %}selected{% endif %}>
+                            {{ v.nickname|default:v }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+            </div>
+            {% if selected_vehicle %}
+                <div class="col-md-2">
+                    <a href="{% url 'maintenance-list' %}" class="btn btn-outline-secondary w-100">Clear Filter</a>
+                </div>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+{% if records %}
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Vehicle</th>
+                            <th>Service</th>
+                            <th>Mileage</th>
+                            <th>Cost</th>
+                            <th>Provider</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in records %}
+                        <tr>
+                            <td>{{ record.service_date }}</td>
+                            <td>{{ record.vehicle.nickname|default:record.vehicle }}</td>
+                            <td>{{ record.category.name }}</td>
+                            <td>{{ record.mileage_at_service }}</td>
+                            <td>${{ record.cost|floatformat:2 }}</td>
+                            <td>{{ record.service_provider|truncatechars:20 }}</td>
+                            <td>
+    <div class="btn-group btn-group-sm">
+        <a href="{% url 'maintenance-update' record.pk %}" class="btn btn-outline-secondary">
+            <i class="fas fa-edit"></i>
+        </a>
+    </div>
+</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="card shadow">
+        <div class="card-body text-center py-5">
+            <h2 class="h4 mb-3">No maintenance records found</h2>
+            <p class="mb-4">
+                {% if selected_vehicle %}
+                    This vehicle doesn't have any maintenance records yet.
+                {% else %}
+                    You haven't added any maintenance records yet.
+                {% endif %}
+            </p>
+            {% if vehicles %}
+                <a href="{% url 'maintenance-create' vehicles.first.pk %}" class="btn btn-primary">
+                    <i class="fas fa-plus-circle me-1"></i> Add Your First Record
+                </a>
+            {% endif %}
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,389 @@
+<!-- templates/vehicles/home.html -->
+{% extends "base.html" %}
+{% block title %}Motivio - Track Your Car Maintenance{% endblock %}
+
+{% block content %}
+<div class="px-4 py-5 my-5 text-center">
+    <h1 class="display-5 fw-bold text-primary">Keep Your Vehicle Running Smoothly</h1>
+    <div class="col-lg-8 mx-auto">
+        <p class="lead mb-4">
+            Motivio helps you track your vehicle's maintenance history, set reminders for upcoming services, and keep your car in optimal condition.
+        </p>
+        <div class="d-grid gap-2 d-sm-flex justify-content-sm-center mt-4">
+            {% if user.is_authenticated %}
+                <a href="{% url 'dashboard' %}" class="btn btn-primary btn-lg px-4 gap-3">Dashboard</a>
+                <a href="{% url 'vehicle-list' %}" class="btn btn-outline-secondary btn-lg px-4">My Vehicles</a>
+            {% else %}
+                <a href="{% url 'register' %}" class="btn btn-primary btn-lg px-4 gap-3">Get Started</a>
+                <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-lg px-4">Login</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<div class="container py-5 bg-light rounded-3">
+    <div class="row g-4">
+        <div class="col-md-4">
+            <div class="card h-100 shadow">
+                <div class="card-body text-center p-4">
+                    <i class="fas fa-car-side fa-3x text-primary mb-3"></i>
+                    <h3 class="card-title h4 mb-3">Vehicle Profiles</h3>
+                    <p class="card-text">Keep track of all your vehicles in one place with detailed profiles including make, model, and VIN.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow">
+                <div class="card-body text-center p-4">
+                    <i class="fas fa-tools fa-3x text-primary mb-3"></i>
+                    <h3 class="card-title h4 mb-3">Maintenance Log</h3>
+                    <p class="card-text">Record all maintenance activities with service dates, costs, and upload receipts for future reference.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card h-100 shadow">
+                <div class="card-body text-center p-4">
+                    <i class="fas fa-bell fa-3x text-primary mb-3"></i>
+                    <h3 class="card-title h4 mb-3">Service Reminders</h3>
+                    <p class="card-text">Set custom reminders for upcoming maintenance based on mileage or time intervals.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container py-5">
+    <div class="row align-items-center">
+        <div class="col-lg-6">
+            <h2 class="fw-bold mb-3">Never Miss Important Maintenance</h2>
+            <p class="mb-4">Regular maintenance is key to keeping your vehicle reliable and avoiding costly repairs. Motivio helps you stay on top of your maintenance schedule with timely reminders and a detailed service history.</p>
+            <ul class="list-unstyled">
+                <li class="mb-2"><i class="fas fa-check text-primary me-2"></i> Compare service costs and hold providers accountable</li>
+                <li class="mb-2"><i class="fas fa-check text-primary me-2"></i> Track mileage and service intervals</li>
+                <li class="mb-2"><i class="fas fa-check text-primary me-2"></i> Get price estimates for common maintenance tasks</li>
+                <li class="mb-2"><i class="fas fa-check text-primary me-2"></i> Access your complete vehicle history anytime</li>
+            </ul>
+        </div>
+        <div class="col-lg-6">
+            <img src="https://via.placeholder.com/600x400" alt="Maintenance Dashboard" class="img-fluid rounded shadow">
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="fw-bold text-primary mb-4">About Motivio</h1>
+            <p class="lead mb-4">
+                Motivio is a user-friendly web application designed to help car owners track their vehicle's maintenance history and manage upcoming service needs through manual data entry.
+            </p>
+
+            <h2 class="h3 mt-5 mb-3">Our Mission</h2>
+            <p>
+                We believe that every car owner should have easy access to their vehicle's maintenance history. Our mission is to provide a simple, effective tool that helps you keep your car running smoothly and avoid costly repairs through proper maintenance tracking.
+            </p>
+
+            <h2 class="h3 mt-5 mb-3">Who We Are</h2>
+            <p>
+                Motivio was created by a team of car enthusiasts and software developers who wanted a better way to track their vehicle maintenance. The team consists of Grace Costello, Aydin Gursoy, and Noman Afzal.
+            </p>
+
+            <h2 class="h3 mt-5 mb-3">Key Features</h2>
+            <div class="row g-4 mt-3">
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-car-alt text-primary me-2"></i> Vehicle Profiles</h5>
+                            <p class="card-text">Add and manage multiple vehicles with detailed information including make, model, year, and VIN.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-tools text-primary me-2"></i> Maintenance Log</h5>
+                            <p class="card-text">Record maintenance activities, upload receipts, and keep a complete service history.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-bell text-primary me-2"></i> Service Reminders</h5>
+                            <p class="card-text">Set up custom reminders for upcoming maintenance based on mileage or time intervals.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-tachometer-alt text-primary me-2"></i> Mileage Tracker</h5>
+                            <p class="card-text">Log mileage periodically to track usage patterns and predict upcoming maintenance.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="h3 mt-5 mb-3">Get Started Today</h2>
+            <p>Ready to take control of your vehicle maintenance?</p>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-start mt-4">
+                <a href="{% url 'register' %}" class="btn btn-primary btn-lg px-4 me-md-2">Sign Up</a>
+                <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-lg px-4">Log In</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+{% block extra_css %}
+<style>
+    .status-pending { background-color: #e2f3f5; }
+    .status-due_soon { background-color: #fff4e0; }
+    .status-overdue { background-color: #ffe0e0; }
+    .status-completed { background-color: #e0ffe0; }
+</style>
+{% endblock %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2 mb-0 text-primary">Dashboard</h1>
+    <div>
+        <a href="{% url 'vehicle-create' %}" class="btn btn-primary">
+            <i class="fas fa-plus-circle me-1"></i> Add Vehicle
+        </a>
+    </div>
+</div>
+
+<!-- Vehicle Summary -->
+<div class="row mb-4">
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Total Vehicles</h6>
+                        <h2 class="mb-0">{{ vehicles.count }}</h2>
+                    </div>
+                    <div class="rounded-circle bg-primary p-3">
+                        <i class="fas fa-car-side text-white fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Total Maintenance Records</h6>
+                        <h2 class="mb-0">{{ maintenance_stats.record_count|default:"0" }}</h2>
+                    </div>
+                    <div class="rounded-circle bg-success p-3">
+                        <i class="fas fa-tools text-white fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Total Spent</h6>
+                        <h2 class="mb-0">${{ maintenance_stats.total_spent|floatformat:2|default:"0.00" }}</h2>
+                    </div>
+                    <div class="rounded-circle bg-danger p-3">
+                        <i class="fas fa-dollar-sign text-white fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Average Service Cost</h6>
+                        <h2 class="mb-0">${{ maintenance_stats.avg_cost|floatformat:2|default:"0.00" }}</h2>
+                    </div>
+                    <div class="rounded-circle bg-info p-3">
+                        <i class="fas fa-chart-line text-white fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- My Vehicles -->
+<div class="card shadow-sm mb-5">
+    <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0">My Vehicles</h5>
+    </div>
+    <div class="card-body">
+        {% if vehicles %}
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                {% for vehicle in vehicles %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        {% if vehicle.image %}
+                            <img src="{{ vehicle.image.url }}" class="card-img-top" alt="{{ vehicle }}" style="height: 160px; object-fit: cover;">
+                        {% else %}
+                            <img src="https://via.placeholder.com/300x160?text={{ vehicle.make }}+{{ vehicle.model }}" class="card-img-top" alt="{{ vehicle }}">
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                {% if vehicle.nickname %}
+                                    {{ vehicle.nickname }}
+                                {% else %}
+                                    {{ vehicle.year }} {{ vehicle.make }} {{ vehicle.model }}
+                                {% endif %}
+                            </h5>
+                            <p class="card-text">
+                                <span class="d-block text-muted mb-2">{{ vehicle.year }} {{ vehicle.make }} {{ vehicle.model }}</span>
+                                <span class="badge bg-secondary">{{ vehicle.current_mileage }} miles</span>
+                            </p>
+                            <a href="{% url 'vehicle-detail' vehicle.pk %}" class="btn btn-sm btn-primary">View Details</a>
+                            <a href="{% url 'maintenance-create' vehicle.pk %}" class="btn btn-sm btn-outline-secondary">Add Service</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-4">
+                <p class="lead mb-3">You haven't added any vehicles yet.</p>
+                <a href="{% url 'vehicle-create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus-circle me-1"></i> Add Your First Vehicle
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <!-- Upcoming Reminders -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Upcoming Maintenance</h5>
+            </div>
+            <div class="card-body">
+                {% if reminders %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Vehicle</th>
+                                    <th>Service</th>
+                                    <th>Due</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for reminder in reminders %}
+                                <tr class="status-{{ reminder.status }}">
+                                    <td>{{ reminder.vehicle.nickname|default:reminder.vehicle }}</td>
+                                    <td>{{ reminder.category.name }}</td>
+                                    <td>
+                                        {% if reminder.due_date %}
+                                            {{ reminder.due_date }}
+                                        {% endif %}
+                                        {% if reminder.due_mileage %}
+                                            {% if reminder.due_date %}<br>{% endif %}
+                                            {{ reminder.due_mileage }} miles
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if reminder.status == 'overdue' %}
+                                            <span class="badge bg-danger">Overdue</span>
+                                        {% elif reminder.status == 'due_soon' %}
+                                            <span class="badge bg-warning text-dark">Due Soon</span>
+                                        {% else %}
+                                            <span class="badge bg-info">Pending</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'reminder-complete' reminder.pk %}" class="btn btn-sm btn-success">
+                                            <i class="fas fa-check"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3 text-end">
+                        <a href="{% url 'reminder-list' %}" class="btn btn-outline-primary btn-sm">View All Reminders</a>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <p class="mb-3">No upcoming maintenance reminders.</p>
+                        {% if vehicles %}
+                            <a href="{% url 'reminder-create' vehicles.first.pk %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus-circle me-1"></i> Add Reminder
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Maintenance -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Recent Maintenance</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_maintenance %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Vehicle</th>
+                                    <th>Service</th>
+                                    <th>Cost</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in recent_maintenance %}
+                                <tr>
+                                    <td>{{ record.service_date }}</td>
+                                    <td>{{ record.vehicle.nickname|default:record.vehicle }}</td>
+                                    <td>{{ record.category.name }}</td>
+                                    <td>${{ record.cost }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3 text-end">
+                        <a href="{% url 'maintenance-list' %}" class="btn btn-outline-primary btn-sm">View All Records</a>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <p class="mb-3">No maintenance records yet.</p>
+                        {% if vehicles %}
+                            <a href="{% url 'maintenance-create' vehicles.first.pk %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus-circle me-1"></i> Add Service Record
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+

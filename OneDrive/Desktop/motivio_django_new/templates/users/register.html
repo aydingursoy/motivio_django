@@ -1,0 +1,162 @@
+<!-- templates/users/register.html -->
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}Register - Motivio{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h2 class="card-title h4 mb-0">Create Account</h2>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <button type="submit" class="btn btn-primary mt-3">Sign Up</button>
+                </form>
+                <div class="border-top mt-4 pt-3">
+                    <small class="text-muted">
+                        Already have an account? <a class="ms-2" href="{% url 'login' %}">Log In</a>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+
+
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h2 class="card-title h4 mb-0">Log In</h2>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <button type="submit" class="btn btn-primary mt-3">Log In</button>
+                    <a class="btn btn-outline-secondary mt-3" href="{% url 'password_reset' %}">Forgot Password?</a>
+                </form>
+                <div class="border-top mt-4 pt-3">
+                    <small class="text-muted">
+                        Need an account? <a class="ms-2" href="{% url 'register' %}">Sign Up</a>
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="card shadow">
+    <div class="card-body text-center py-5">
+        <h2 class="mb-4">You have been logged out</h2>
+        <p class="lead mb-4">Thank you for using Motivio!</p>
+        <a class="btn btn-primary" href="{% url 'login' %}">Log In Again</a>
+    </div>
+</div>
+
+
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title h5 mb-0">Profile Picture</h3>
+            </div>
+            <div class="card-body text-center py-4">
+                <img class="rounded-circle img-fluid mb-3" style="max-width: 150px;"
+                     src="{{ user.profile.image.url }}" alt="Profile Picture">
+                <h3 class="h5 mb-0">{{ user.username }}</h3>
+                <p class="text-muted">{{ user.email }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h3 class="card-title h5 mb-0">Edit Profile</h3>
+            </div>
+            <div class="card-body">
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <fieldset class="mb-3">
+                        <legend class="border-bottom mb-3 pb-2">Account Info</legend>
+                        {{ u_form|crispy }}
+                    </fieldset>
+                    <fieldset class="mb-3">
+                        <legend class="border-bottom mb-3 pb-2">Profile Info</legend>
+                        {{ p_form|crispy }}
+                    </fieldset>
+                    <div class="d-grid">
+                        <button class="btn btn-primary" type="submit">Update Profile</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h2 class="card-title h4 mb-0">Reset Password</h2>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    <p class="mb-3">Enter your email address and we'll send you instructions to reset your password.</p>
+                    {{ form|crispy }}
+                    <button type="submit" class="btn btn-primary mt-3">Request Password Reset</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow">
+    <div class="card-body text-center py-5">
+        <h2 class="mb-4">Check your inbox</h2>
+        <p class="lead mb-4">We've emailed you instructions for setting your password. You should receive the email shortly!</p>
+        <a class="btn btn-primary" href="{% url 'login' %}">Return to Login</a>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h2 class="card-title h4 mb-0">Set New Password</h2>
+            </div>
+            <div class="card-body">
+                {% if validlink %}
+                    <form method="POST">
+                        {% csrf_token %}
+                        {{ form|crispy }}
+                        <button type="submit" class="btn btn-primary mt-3">Set New Password</button>
+                    </form>
+                {% else %}
+                    <p class="alert alert-danger">The password reset link was invalid, possibly because it has already been used. Please request a new password reset.</p>
+                    <a class="btn btn-primary" href="{% url 'password_reset' %}">Request New Reset Link</a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow">
+    <div class="card-body text-center py-5">
+        <h2 class="mb-4">Password reset complete</h2>
+        <p class="lead mb-4">Your password has been set. You may go ahead and log in now.</p>
+        <a class="btn btn-primary" href="{% url 'login' %}">Log In</a>
+    </div>
+</div>
+\

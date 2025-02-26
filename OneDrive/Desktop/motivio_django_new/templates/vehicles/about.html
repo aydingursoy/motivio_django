@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}About Motivio{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <h1 class="fw-bold text-primary mb-4">About Motivio</h1>
+            <p class="lead mb-4">
+                Motivio is a user-friendly web application designed to help car owners track their vehicle's maintenance history and manage upcoming service needs through manual data entry.
+            </p>
+
+            <h2 class="h3 mt-5 mb-3">Our Mission</h2>
+            <p>
+                We believe that every car owner should have easy access to their vehicle's maintenance history. Our mission is to provide a simple, effective tool that helps you keep your car running smoothly and avoid costly repairs through proper maintenance tracking.
+            </p>
+
+            <h2 class="h3 mt-5 mb-3">Who We Are</h2>
+            <p>
+                Motivio was created by a team of car enthusiasts and software developers who wanted a better way to track their vehicle maintenance. The team consists of Grace Costello, Aydin Gursoy, and Noman Afzal.
+            </p>
+
+            <h2 class="h3 mt-5 mb-3">Key Features</h2>
+            <div class="row g-4 mt-3">
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-car-alt text-primary me-2"></i> Vehicle Profiles</h5>
+                            <p class="card-text">Add and manage multiple vehicles with detailed information including make, model, year, and VIN.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-tools text-primary me-2"></i> Maintenance Log</h5>
+                            <p class="card-text">Record maintenance activities, upload receipts, and keep a complete service history.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-bell text-primary me-2"></i> Service Reminders</h5>
+                            <p class="card-text">Set up custom reminders for upcoming maintenance based on mileage or time intervals.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card h-100 shadow-sm">
+                        <div class="card-body">
+                            <h5 class="card-title"><i class="fas fa-tachometer-alt text-primary me-2"></i> Mileage Tracker</h5>
+                            <p class="card-text">Log mileage periodically to track usage patterns and predict upcoming maintenance.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h2 class="h3 mt-5 mb-3">Get Started Today</h2>
+            <p>Ready to take control of your vehicle maintenance?</p>
+            <div class="d-grid gap-2 d-md-flex justify-content-md-start mt-4">
+                <a href="{% url 'register' %}" class="btn btn-primary btn-lg px-4 me-md-2">Sign Up</a>
+                <a href="{% url 'login' %}" class="btn btn-outline-secondary btn-lg px-4">Log In</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

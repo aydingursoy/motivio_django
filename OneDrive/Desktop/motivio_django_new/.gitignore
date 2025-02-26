@@ -1,0 +1,16 @@
+# Ignore system files and unnecessary folders
+.DS_Store
+Thumbs.db
+*.log
+*.pyc
+__pycache__/
+.vscode/
+.idea/
+node_modules/
+.cache/
+.VirtualBox/
+eclipse/
+.gitconfig/
+jdk/
+.ssh/
+p2/

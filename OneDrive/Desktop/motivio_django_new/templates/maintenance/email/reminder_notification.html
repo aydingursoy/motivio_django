@@ -1,0 +1,96 @@
+<!-- templates/maintenance/email/reminder_notification.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Maintenance Reminder</title>
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; }
+        .header { background-color: #007bff; color: white; padding: 20px; text-align: center; }
+        .content { padding: 20px; }
+        .vehicle { font-weight: bold; }
+        .footer { background-color: #f8f9fa; padding: 15px; text-align: center; font-size: 12px; color: #6c757d; }
+        .button { display: inline-block; background-color: #007bff; color: white; padding: 10px 20px;
+                 text-decoration: none; border-radius: 4px; margin-top: 15px; }
+        .status-overdue { color: #dc3545; font-weight: bold; }
+        .status-due_soon { color: #ffc107; font-weight: bold; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Maintenance Reminder</h1>
+    </div>
+    <div class="content">
+        <p>Hello {{ user.first_name|default:user.username }},</p>
+
+        <p>This is a reminder about upcoming maintenance for your vehicle:</p>
+
+        <p class="vehicle">{{ vehicle.year }} {{ vehicle.make }} {{ vehicle.model }}
+            {% if vehicle.nickname %}({{ vehicle.nickname }}){% endif %}</p>
+
+        <p>
+            <strong>Service:</strong> {{ reminder.category.name }}<br>
+            {% if reminder.status == 'overdue' %}
+                <strong class="status-overdue">Status: OVERDUE</strong><br>
+            {% elif reminder.status == 'due_soon' %}
+                <strong class="status-due_soon">Status: DUE SOON</strong><br>
+            {% endif %}
+
+            {% if reminder.due_date %}
+                <strong>Due Date:</strong> {{ reminder.due_date }}<br>
+            {% endif %}
+
+            {% if reminder.due_mileage %}
+                <strong>Due Mileage:</strong> {{ reminder.due_mileage }} miles<br>
+                <strong>Current Mileage:</strong> {{ vehicle.current_mileage }} miles<br>
+            {% endif %}
+
+            {% if reminder.suggested_cost %}
+                <strong>Estimated Cost:</strong> ${{ reminder.suggested_cost|floatformat:2 }}<br>
+            {% endif %}
+        </p>
+
+        {% if reminder.notes %}
+            <p><strong>Notes:</strong> {{ reminder.notes }}</p>
+        {% endif %}
+
+        <p>Regular maintenance helps keep your vehicle running smoothly and can prevent costly repairs down the road.</p>
+
+        <a href="{{ app_url }}{{ reminder_url }}" class="button">View All Reminders</a>
+    </div>
+    <div class="footer">
+        <p>This is an automated message from Motivio, your car maintenance tracker.</p>
+        <p>© {% now "Y" %} Motivio. All rights reserved.</p>
+    </div>
+</body>
+</html>
+
+<!-- templates/maintenance/email/reminder_notification.txt -->
+Maintenance Reminder
+
+Hello {{ user.first_name|default:user.username }},
+
+This is a reminder about upcoming maintenance for your vehicle:
+
+{{ vehicle.year }} {{ vehicle.make }} {{ vehicle.model }} {% if vehicle.nickname %}({{ vehicle.nickname }}){% endif %}
+
+Service: {{ reminder.category.name }}
+{% if reminder.status == 'overdue' %}Status: OVERDUE{% elif reminder.status == 'due_soon' %}Status: DUE SOON{% endif %}
+
+{% if reminder.due_date %}Due Date: {{ reminder.due_date }}{% endif %}
+{% if reminder.due_mileage %}
+Due Mileage: {{ reminder.due_mileage }} miles
+Current Mileage: {{ vehicle.current_mileage }} miles
+{% endif %}
+
+{% if reminder.suggested_cost %}Estimated Cost: ${{ reminder.suggested_cost|floatformat:2 }}{% endif %}
+
+{% if reminder.notes %}Notes: {{ reminder.notes }}{% endif %}
+
+Regular maintenance helps keep your vehicle running smoothly and can prevent costly repairs down the road.
+
+View all your reminders at: {{ app_url }}{{ reminder_url }}
+
+--
+This is an automated message from Motivio, your car maintenance tracker.
+© {% now "Y" %} Motivio. All rights reserved.
