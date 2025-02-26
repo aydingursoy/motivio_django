@@ -1,0 +1,253 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - Motivio{% endblock %}
+
+{% block content %}
+<style>
+    .status-pending { background-color: #e2f3f5; }
+    .status-due_soon { background-color: #fff4e0; }
+    .status-overdue { background-color: #ffe0e0; }
+    .status-completed { background-color: #e0ffe0; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2 mb-0 text-primary">Dashboard</h1>
+    <div>
+        <a href="{% url 'vehicle-create' %}" class="btn btn-primary">
+            <i class="fas fa-plus-circle me-1"></i> Add Vehicle
+        </a>
+    </div>
+</div>
+
+<!-- Vehicle Summary -->
+<div class="row mb-4">
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Total Vehicles</h6>
+                        <h2 class="mb-0">{{ vehicles.count }}</h2>
+                    </div>
+                    <div class="rounded-circle bg-primary p-3">
+                        <i class="fas fa-car-side text-white fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Total Maintenance Records</h6>
+                        <h2 class="mb-0">{{ maintenance_stats.record_count|default:"0" }}</h2>
+                    </div>
+                    <div class="rounded-circle bg-success p-3">
+                        <i class="fas fa-tools text-white fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Total Spent</h6>
+                        <h2 class="mb-0">${{ maintenance_stats.total_spent|floatformat:2|default:"0.00" }}</h2>
+                    </div>
+                    <div class="rounded-circle bg-danger p-3">
+                        <i class="fas fa-dollar-sign text-white fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6 col-lg-3 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h6 class="text-muted mb-1">Average Service Cost</h6>
+                        <h2 class="mb-0">${{ maintenance_stats.avg_cost|floatformat:2|default:"0.00" }}</h2>
+                    </div>
+                    <div class="rounded-circle bg-info p-3">
+                        <i class="fas fa-chart-line text-white fa-lg"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- My Vehicles -->
+<div class="card shadow-sm mb-5">
+    <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0">My Vehicles</h5>
+    </div>
+    <div class="card-body">
+        {% if vehicles %}
+            <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                {% for vehicle in vehicles %}
+                <div class="col">
+                    <div class="card h-100 shadow-sm">
+                        {% if vehicle.image %}
+                            <img src="{{ vehicle.image.url }}" class="card-img-top" alt="{{ vehicle }}" style="height: 160px; object-fit: cover;">
+                        {% else %}
+                            <div class="bg-light text-center py-5">
+                                <i class="fas fa-car fa-3x text-secondary"></i>
+                            </div>
+                        {% endif %}
+                        <div class="card-body">
+                            <h5 class="card-title">
+                                {% if vehicle.nickname %}
+                                    {{ vehicle.nickname }}
+                                {% else %}
+                                    {{ vehicle.year }} {{ vehicle.make }} {{ vehicle.model }}
+                                {% endif %}
+                            </h5>
+                            <p class="card-text">
+                                <span class="d-block text-muted mb-2">{{ vehicle.year }} {{ vehicle.make }} {{ vehicle.model }}</span>
+                                <span class="badge bg-secondary">{{ vehicle.current_mileage }} miles</span>
+                            </p>
+                            <a href="{% url 'vehicle-detail' vehicle.pk %}" class="btn btn-sm btn-primary">View Details</a>
+                            <a href="{% url 'maintenance-create' vehicle.pk %}" class="btn btn-sm btn-outline-secondary">Add Service</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <div class="text-center py-4">
+                <p class="lead mb-3">You haven't added any vehicles yet.</p>
+                <a href="{% url 'vehicle-create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus-circle me-1"></i> Add Your First Vehicle
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<div class="row">
+    <!-- Upcoming Reminders -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Upcoming Maintenance</h5>
+            </div>
+            <div class="card-body">
+                {% if reminders %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Vehicle</th>
+                                    <th>Service</th>
+                                    <th>Due</th>
+                                    <th>Status</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for reminder in reminders %}
+                                <tr class="status-{{ reminder.status }}">
+                                    <td>{{ reminder.vehicle.nickname|default:reminder.vehicle }}</td>
+                                    <td>{{ reminder.category.name }}</td>
+                                    <td>
+                                        {% if reminder.due_date %}
+                                            {{ reminder.due_date }}
+                                        {% endif %}
+                                        {% if reminder.due_mileage %}
+                                            {% if reminder.due_date %}<br>{% endif %}
+                                            {{ reminder.due_mileage }} miles
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if reminder.status == 'overdue' %}
+                                            <span class="badge bg-danger">Overdue</span>
+                                        {% elif reminder.status == 'due_soon' %}
+                                            <span class="badge bg-warning text-dark">Due Soon</span>
+                                        {% else %}
+                                            <span class="badge bg-info">Pending</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <a href="{% url 'reminder-complete' reminder.pk %}" class="btn btn-sm btn-success">
+                                            <i class="fas fa-check"></i>
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3 text-end">
+                        <a href="{% url 'reminder-list' %}" class="btn btn-outline-primary btn-sm">View All Reminders</a>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <p class="mb-3">No upcoming maintenance reminders.</p>
+                        {% if vehicles %}
+                            <a href="{% url 'reminder-create' vehicles.first.pk %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus-circle me-1"></i> Add Reminder
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Maintenance -->
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Recent Maintenance</h5>
+            </div>
+            <div class="card-body">
+                {% if recent_maintenance %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Vehicle</th>
+                                    <th>Service</th>
+                                    <th>Cost</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for record in recent_maintenance %}
+                                <tr>
+                                    <td>{{ record.service_date }}</td>
+                                    <td>{{ record.vehicle.nickname|default:record.vehicle }}</td>
+                                    <td>{{ record.category.name }}</td>
+                                    <td>${{ record.cost|floatformat:2 }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="mt-3 text-end">
+                        <a href="{% url 'maintenance-list' %}" class="btn btn-outline-primary btn-sm">View All Records</a>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <p class="mb-3">No maintenance records yet.</p>
+                        {% if vehicles %}
+                            <a href="{% url 'maintenance-create' vehicles.first.pk %}" class="btn btn-primary btn-sm">
+                                <i class="fas fa-plus-circle me-1"></i> Add Service Record
+                            </a>
+                        {% endif %}
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

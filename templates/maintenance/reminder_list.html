@@ -1,0 +1,173 @@
+{% extends "base.html" %}
+{% block title %}Maintenance Reminders - Motivio{% endblock %}
+
+{% block content %}
+<style>
+    .status-pending { background-color: #e2f3f5; }
+    .status-due_soon { background-color: #fff4e0; }
+    .status-overdue { background-color: #ffe0e0; }
+    .status-completed { background-color: #e0ffe0; }
+</style>
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2 mb-0 text-primary">Maintenance Reminders</h1>
+    <div>
+        {% if vehicles %}
+            <a href="{% url 'reminder-create' vehicles.first.pk %}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-1"></i> Add Reminder
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Filter Controls -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <div class="row g-2">
+            <div class="col-md-8">
+                <form method="get" class="row g-3 align-items-end">
+                    <div class="col-md-5">
+                        <label for="vehicleFilter" class="form-label">Filter by Vehicle</label>
+                        <select name="vehicle" id="vehicleFilter" class="form-select">
+                            <option value="">All Vehicles</option>
+                            {% for v in vehicles %}
+                                <option value="{{ v.id }}" {% if selected_vehicle == v.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ v.nickname|default:v }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-5">
+                        <label for="statusFilter" class="form-label">Filter by Status</label>
+                        <select name="status" id="statusFilter" class="form-select">
+                            <option value="">All Status</option>
+                            <option value="pending" {% if selected_status == 'pending' %}selected{% endif %}>Pending</option>
+                            <option value="due_soon" {% if selected_status == 'due_soon' %}selected{% endif %}>Due Soon</option>
+                            <option value="overdue" {% if selected_status == 'overdue' %}selected{% endif %}>Overdue</option>
+                            <option value="completed" {% if selected_status == 'completed' %}selected{% endif %}>Completed</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">Filter</button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0">
+                    <div class="card-body p-0">
+                        <div class="row row-cols-2 row-cols-sm-4 g-2 text-center">
+                            <div class="col">
+                                <div class="p-2 rounded status-pending">
+                                    <span class="d-block fw-bold">{{ status_counts.pending }}</span>
+                                    <small>Pending</small>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="p-2 rounded status-due_soon">
+                                    <span class="d-block fw-bold">{{ status_counts.due_soon }}</span>
+                                    <small>Due Soon</small>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="p-2 rounded status-overdue">
+                                    <span class="d-block fw-bold">{{ status_counts.overdue }}</span>
+                                    <small>Overdue</small>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="p-2 rounded status-completed">
+                                    <span class="d-block fw-bold">{{ status_counts.completed }}</span>
+                                    <small>Completed</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if reminders %}
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Vehicle</th>
+                            <th>Service</th>
+                            <th>Due Date</th>
+                            <th>Due Mileage</th>
+                            <th>Status</th>
+                            <th>Est. Cost</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for reminder in reminders %}
+                        <tr class="status-{{ reminder.status }}">
+                            <td>{{ reminder.vehicle.nickname|default:reminder.vehicle }}</td>
+                            <td>{{ reminder.category.name }}</td>
+                            <td>{% if reminder.due_date %}{{ reminder.due_date }}{% else %}--{% endif %}</td>
+                            <td>{% if reminder.due_mileage %}{{ reminder.due_mileage }}{% else %}--{% endif %}</td>
+                            <td>
+                                {% if reminder.status == 'overdue' %}
+                                    <span class="badge bg-danger">Overdue</span>
+                                {% elif reminder.status == 'due_soon' %}
+                                    <span class="badge bg-warning text-dark">Due Soon</span>
+                                {% elif reminder.status == 'completed' %}
+                                    <span class="badge bg-success">Completed</span>
+                                {% else %}
+                                    <span class="badge bg-info">Pending</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if reminder.suggested_cost %}
+                                    ${{ reminder.suggested_cost|floatformat:2 }}
+                                {% else %}
+                                    --
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    {% if reminder.status != 'completed' %}
+                                    <a href="{% url 'reminder-complete' reminder.pk %}" class="btn btn-success">
+                                        <i class="fas fa-check"></i>
+                                    </a>
+                                    {% endif %}
+                                    <a href="{% url 'reminder-update' reminder.pk %}" class="btn btn-outline-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'reminder-delete' reminder.pk %}" class="btn btn-outline-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="card shadow">
+        <div class="card-body text-center py-5">
+            <h2 class="h4 mb-3">No maintenance reminders found</h2>
+            <p class="mb-4">
+                {% if selected_vehicle or selected_status %}
+                    No reminders match your current filter. Try changing your filter criteria.
+                {% else %}
+                    You haven't set up any maintenance reminders yet.
+                {% endif %}
+            </p>
+            {% if vehicles and not selected_vehicle and not selected_status %}
+                <a href="{% url 'reminder-create' vehicles.first.pk %}" class="btn btn-primary">
+                    <i class="fas fa-plus-circle me-1"></i> Set Your First Reminder
+                </a>
+            {% endif %}
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

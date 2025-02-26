@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+{% block title %}Add Mileage Record - Motivio{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-tachometer-alt me-1"></i>
+                    Add Mileage Record
+                </h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label for="vehicle" class="form-label">Vehicle</label>
+                        <select name="vehicle" id="vehicle" class="form-select" required>
+                            <option value="">Select Vehicle</option>
+                            {% for vehicle in vehicles %}
+                                <option value="{{ vehicle.id }}" {% if vehicle.id == selected_vehicle.id %}selected{% endif %}>
+                                    {{ vehicle.nickname|default:vehicle }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="mileage" class="form-label">Current Mileage</label>
+                        <input type="number"
+                               name="mileage"
+                               id="mileage"
+                               class="form-control"
+                               placeholder="Enter current vehicle mileage"
+                               required
+                               min="0"
+                               step="1">
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="date" class="form-label">Date of Mileage Reading</label>
+                        <input type="date"
+                               name="date"
+                               id="date"
+                               class="form-control"
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="notes" class="form-label">Notes (Optional)</label>
+                        <textarea
+                            name="notes"
+                            id="notes"
+                            class="form-control"
+                            rows="3"
+                            placeholder="Any additional information about this mileage reading"
+                        ></textarea>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a href="#" onclick="window.history.back();" class="btn btn-secondary">
+                            Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-1"></i>Save Mileage Record
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    // Set the date input to today's date by default
+    document.getElementById('date').valueAsDate = new Date();
+</script>
+{% endblock %}
