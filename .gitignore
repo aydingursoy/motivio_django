@@ -1,16 +1,20 @@
-# Ignore system files and unnecessary folders
-.DS_Store
-Thumbs.db
-*.log
+# Python
 *.pyc
 __pycache__/
+
+# Environment
+.env
+venv/
+*.sqlite3
+
+# Django stuff
+staticfiles/
+db.sqlite3
+
+# VSCode/JetBrains
 .vscode/
 .idea/
-node_modules/
-.cache/
-.VirtualBox/
-eclipse/
-.gitconfig/
-jdk/
-.ssh/
-p2/
+
+# OS stuff
+.DS_Store
+Thumbs.db
