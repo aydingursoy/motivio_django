@@ -1,0 +1,12 @@
+Django==4.2.3
+Pillow==10.0.0
+django-crispy-forms==2.0
+crispy-bootstrap5==0.7
+djangorestframework==3.14.0
+python-decouple==3.8
+psycopg2-binary==2.9.6
+django-storages==1.13.2
+boto3==1.28.3
+celery==5.3.1
+redis==4.6.0
+gunicorn==21.2.0

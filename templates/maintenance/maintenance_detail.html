@@ -1,0 +1,442 @@
+<!-- templates/maintenance/maintenance_list.html -->
+{% extends "base.html" %}
+{% block title %}Maintenance History - Motivio
+
+<!-- templates/maintenance/maintenance_detail.html -->
+
+<div class="row justify-content-center">
+    <div class="col-lg-10">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h2 class="card-title h4 mb-0">Maintenance Details</h2>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-4">
+                        <h3 class="h5 mb-3">Service Information</h3>
+                        <dl class="row mb-0">
+                            <dt class="col-sm-4">Vehicle:</dt>
+                            <dd class="col-sm-8">{{ record.vehicle.nickname|default:record.vehicle }}</dd>
+
+                            <dt class="col-sm-4">Service:</dt>
+                            <dd class="col-sm-8">{{ record.category.name }}</dd>
+
+                            <dt class="col-sm-4">Service Date:</dt>
+                            <dd class="col-sm-8">{{ record.service_date }}</dd>
+
+                            <dt class="col-sm-4">Mileage:</dt>
+                            <dd class="col-sm-8">{{ record.mileage_at_service }} miles</dd>
+
+                            <dt class="col-sm-4">Provider:</dt>
+                            <dd class="col-sm-8">{{ record.service_provider|default:"Not specified" }}</dd>
+
+                            <dt class="col-sm-4">Total Cost:</dt>
+                            <dd class="col-sm-8">${{ record.cost|floatformat:2 }}</dd>
+
+                            {% if record.estimated_cost %}
+                            <dt class="col-sm-4">Estimated Cost:</dt>
+                            <dd class="col-sm-8">
+                                ${{ record.estimated_cost|floatformat:2 }}
+                                {% if record.cost > record.estimated_cost %}
+                                    <span class="badge bg-danger ms-2">
+                                        ${{ record.cost|sub:record.estimated_cost|floatformat:2 }} over estimate
+                                    </span>
+                                {% elif record.cost < record.estimated_cost %}
+                                    <span class="badge bg-success ms-2">
+                                        ${{ record.estimated_cost|sub:record.cost|floatformat:2 }} under estimate
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-secondary ms-2">Matched estimate</span>
+                                {% endif %}
+                            </dd>
+                            {% endif %}
+
+                            {% if cost_estimate %}
+                            <dt class="col-sm-4">Market Average:</dt>
+                            <dd class="col-sm-8">
+                                ${{ cost_estimate.average_cost|floatformat:2 }}
+                                <small class="text-muted d-block">(Range: ${{ cost_estimate.min_cost|floatformat:2 }} - ${{ cost_estimate.max_cost|floatformat:2 }})</small>
+
+                                {% if record.cost > cost_estimate.average_cost %}
+                                    <span class="badge bg-warning text-dark mt-1">
+                                        ${{ record.cost|sub:cost_estimate.average_cost|floatformat:2 }} over average
+                                    </span>
+                                {% elif record.cost < cost_estimate.average_cost %}
+                                    <span class="badge bg-success mt-1">
+                                        ${{ cost_estimate.average_cost|sub:record.cost|floatformat:2 }} under average
+                                    </span>
+                                {% endif %}
+                            </dd>
+                            {% endif %}
+                        </dl>
+                    </div>
+
+                    <div class="col-md-6 mb-4">
+                        <h3 class="h5 mb-3">Service Details</h3>
+                        <div class="card">
+                            <div class="card-body">
+                                <p class="card-text">{{ record.service_details|linebreaks }}</p>
+
+                                {% if record.notes %}
+                                    <h5 class="h6 mt-3">Additional Notes</h5>
+                                    <p class="card-text text-muted">{{ record.notes|linebreaks }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        {% if record.receipt_image %}
+                            <div class="mt-3">
+                                <h3 class="h5 mb-2">Receipt</h3>
+                                <div class="card">
+                                    <img src="{{ record.receipt_image.url }}" class="img-fluid" alt="Receipt">
+                                    <div class="card-body text-center">
+                                        <a href="{{ record.receipt_image.url }}" class="btn btn-sm btn-outline-primary" target="_blank">
+                                            <i class="fas fa-search-plus me-1"></i> View Full Size
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <hr>
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'vehicle-detail' record.vehicle.pk %}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> Back to Vehicle
+                    </a>
+                    <div>
+                        <a href="{% url 'maintenance-update' record.pk %}" class="btn btn-primary me-2">
+                            <i class="fas fa-edit me-1"></i> Edit
+                        </a>
+                        <a href="{% url 'maintenance-delete' record.pk %}" class="btn btn-outline-danger">
+                            <i class="fas fa-trash me-1"></i> Delete
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- templates/maintenance/maintenance_form.html -->
+{% extends "base.html" %}
+{% load crispy_forms_tags %}
+
+{% block title %}{{ title }} - Motivio{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h2 class="card-title h4 mb-0">{{ title }}</h2>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <h5>Vehicle: {{ vehicle.nickname|default:vehicle }}</h5>
+                    <p class="text-muted mb-0">Current mileage: {{ vehicle.current_mileage }} miles</p>
+                </div>
+
+                <form method="POST" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    {{ form|crispy }}
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{% url 'vehicle-detail' vehicle.pk %}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-primary">Save Record</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- templates/maintenance/maintenance_confirm_delete.html -->
+{% extends "base.html" %}
+{% block title %}Delete Maintenance Record - Motivio{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card shadow">
+            <div class="card-header bg-danger text-white">
+                <h2 class="card-title h4 mb-0">Delete Maintenance Record</h2>
+            </div>
+            <div class="card-body">
+                <p class="lead">Are you sure you want to delete this maintenance record?</p>
+                <div class="card mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ record.category.name }}</h5>
+                        <p class="card-text">
+                            <strong>Vehicle:</strong> {{ record.vehicle.nickname|default:record.vehicle }}<br>
+                            <strong>Date:</strong> {{ record.service_date }}<br>
+                            <strong>Mileage:</strong> {{ record.mileage_at_service }} miles<br>
+                            <strong>Cost:</strong> ${{ record.cost|floatformat:2 }}
+                        </p>
+                    </div>
+                </div>
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'maintenance-detail' record.pk %}" class="btn btn-outline-secondary">Cancel</a>
+                        <button type="submit" class="btn btn-danger">Delete Record</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+<!-- templates/maintenance/reminder_list.html -->
+{% extends "base.html" %}
+{% block title %}Maintenance Reminders - Motivio{% endblock %}
+
+{% block extra_css %}
+<style>
+    .status-pending { background-color: #e2f3f5; }
+    .status-due_soon { background-color: #fff4e0; }
+    .status-overdue { background-color: #ffe0e0; }
+    .status-completed { background-color: #e0ffe0; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2 mb-0 text-primary">Maintenance Reminders</h1>
+    <div>
+        {% if vehicles %}
+            <a href="{% url 'reminder-create' vehicles.first.pk %}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-1"></i> Add Reminder
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Filter Controls -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <div class="row g-2">
+            <div class="col-md-8">
+                <form method="get" class="row g-3 align-items-end">
+                    <div class="col-md-5">
+                        <label for="vehicleFilter" class="form-label">Filter by Vehicle</label>
+                        <select name="vehicle" id="vehicleFilter" class="form-select">
+                            <option value="">All Vehicles</option>
+                            {% for v in vehicles %}
+                                <option value="{{ v.id }}" {% if selected_vehicle == v.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ v.nickname|default:v }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-5">
+                        <label for="statusFilter" class="form-label">Filter by Status</label>
+                        <select name="status" id="statusFilter" class="form-select">
+                            <option value="">All Status</option>
+                            <option value="pending" {% if selected_status == 'pending' %}selected{% endif %}>Pending</option>
+                            <option value="due_soon" {% if selected_status == 'due_soon' %}selected{% endif %}>Due Soon</option>
+                            <option value="overdue" {% if selected_status == 'overdue' %}selected{% endif %}>Overdue</option>
+                            <option value="completed" {% if selected_status == 'completed' %}selected{% endif %}>Completed</option>
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <button type="submit" class="btn btn-primary w-100">Filter</button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-4">
+                <div class="card border-0">
+                    <div class="card-body p-0">
+                        <div class="row row-cols-2 row-cols-sm-4 g-2 text-center">
+                            <div class="col">
+                                <div class="p-2 rounded status-pending">
+                                    <span class="d-block fw-bold">{{ status_counts.pending }}</span>
+                                    <small>Pending</small>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="p-2 rounded status-due_soon">
+                                    <span class="d-block fw-bold">{{ status_counts.due_soon }}</span>
+                                    <small>Due Soon</small>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="p-2 rounded status-overdue">
+                                    <span class="d-block fw-bold">{{ status_counts.overdue }}</span>
+                                    <small>Overdue</small>
+                                </div>
+                            </div>
+                            <div class="col">
+                                <div class="p-2 rounded status-completed">
+                                    <span class="d-block fw-bold">{{ status_counts.completed }}</span>
+                                    <small>Completed</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% if reminders %}
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Vehicle</th>
+                            <th>Service</th>
+                            <th>Due Date</th>
+                            <th>Due Mileage</th>
+                            <th>Status</th>
+                            <th>Est. Cost</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for reminder in reminders %}
+                        <tr class="status-{{ reminder.status }}">
+                            <td>{{ reminder.vehicle.nickname|default:reminder.vehicle }}</td>
+                            <td>{{ reminder.category.name }}</td>
+                            <td>{% if reminder.due_date %}{{ reminder.due_date }}{% else %}--{% endif %}</td>
+                            <td>{% if reminder.due_mileage %}{{ reminder.due_mileage }}{% else %}--{% endif %}</td>
+                            <td>
+                                {% if reminder.status == 'overdue' %}
+                                    <span class="badge bg-danger">Overdue</span>
+                                {% elif reminder.status == 'due_soon' %}
+                                    <span class="badge bg-warning text-dark">Due Soon</span>
+                                {% elif reminder.status == 'completed' %}
+                                    <span class="badge bg-success">Completed</span>
+                                {% else %}
+                                    <span class="badge bg-info">Pending</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if reminder.suggested_cost %}
+                                    ${{ reminder.suggested_cost|floatformat:2 }}
+                                {% else %}
+                                    --
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    {% if reminder.status != 'completed' %}
+                                    <a href="{% url 'reminder-complete' reminder.pk %}" class="btn btn-success">
+                                        <i class="fas fa-check"></i>
+                                    </a>
+                                    {% endif %}
+                                    <a href="{% url 'reminder-update' reminder.pk %}" class="btn btn-outline-primary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="h2 mb-0 text-primary">Maintenance History</h1>
+    <div>
+        {% if vehicles %}
+            <a href="{% url 'maintenance-create' vehicles.first.pk %}" class="btn btn-primary">
+                <i class="fas fa-plus-circle me-1"></i> Add Record
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Filter Controls -->
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        <form method="get" class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label for="vehicleFilter" class="form-label">Filter by Vehicle</label>
+                <select name="vehicle" id="vehicleFilter" class="form-select">
+                    <option value="">All Vehicles</option>
+                    {% for v in vehicles %}
+                        <option value="{{ v.id }}" {% if selected_vehicle == v.id|stringformat:"s" %}selected{% endif %}>
+                            {{ v.nickname|default:v }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-2">
+                <button type="submit" class="btn btn-primary w-100">Filter</button>
+            </div>
+            {% if selected_vehicle %}
+                <div class="col-md-2">
+                    <a href="{% url 'maintenance-list' %}" class="btn btn-outline-secondary w-100">Clear Filter</a>
+                </div>
+            {% endif %}
+        </form>
+    </div>
+</div>
+
+{% if records %}
+    <div class="card shadow">
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Vehicle</th>
+                            <th>Service</th>
+                            <th>Mileage</th>
+                            <th>Cost</th>
+                            <th>Provider</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for record in records %}
+                        <tr>
+                            <td>{{ record.service_date }}</td>
+                            <td>{{ record.vehicle.nickname|default:record.vehicle }}</td>
+                            <td>{{ record.category.name }}</td>
+                            <td>{{ record.mileage_at_service }}</td>
+                            <td>${{ record.cost|floatformat:2 }}</td>
+                            <td>{{ record.service_provider|truncatechars:20 }}</td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <a href="{% url 'maintenance-detail' record.pk %}" class="btn btn-outline-primary">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{% url 'maintenance-update' record.pk %}" class="btn btn-outline-secondary">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <a href="{% url 'maintenance-delete' record.pk %}" class="btn btn-outline-danger">
+                                        <i class="fas fa-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+{% else %}
+    <div class="card shadow">
+        <div class="card-body text-center py-5">
+            <h2 class="h4 mb-3">No maintenance records found</h2>
+            <p class="mb-4">
+                {% if selected_vehicle %}
+                    This vehicle doesn't have any maintenance records yet.
+                {% else %}
+                    You haven't added any maintenance records yet.
+                {% endif %}
+            </p>
+            {% if vehicles %}
+                <a href="{% url 'maintenance-create' vehicles.first.pk %}" class="btn btn-primary">
+                    <i class="fas fa-plus-circle me-1"></i> Add Your First Record
+                </a>
+            {% endif %}
+        </div>
+    </div>
+{% endif %}
+{% endblock %}

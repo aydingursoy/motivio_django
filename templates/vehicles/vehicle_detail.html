@@ -1,0 +1,273 @@
+{% extends "base.html" %}
+{% block title %}{{ vehicle.nickname|default:vehicle }} - Motivio{% endblock %}
+
+{% block content %}
+<div class="row">
+    <!-- Vehicle Info -->
+    <div class="col-lg-4 mb-4">
+        <div class="card shadow">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Vehicle Details</h5>
+            </div>
+
+            {% if vehicle.image %}
+                <img src="{{ vehicle.image.url }}" class="card-img-top" alt="{{ vehicle }}" style="height: 200px; object-fit: cover;">
+            {% else %}
+                <div class="bg-light text-center py-5">
+                    <i class="fas fa-car fa-3x text-secondary"></i>
+                </div>
+            {% endif %}
+
+            <div class="card-body">
+                <h2 class="h4 mb-3">
+                    {% if vehicle.nickname %}
+                        {{ vehicle.nickname }}
+                        <small class="d-block text-muted fs-6 mt-1">{{ vehicle.year }} {{ vehicle.make }} {{ vehicle.model }}</small>
+                    {% else %}
+                        {{ vehicle.year }} {{ vehicle.make }} {{ vehicle.model }}
+                    {% endif %}
+                </h2>
+
+                <dl class="row mb-0">
+                    <dt class="col-sm-5">Current Mileage:</dt>
+                    <dd class="col-sm-7">{{ vehicle.current_mileage }} miles</dd>
+
+                    {% if vehicle.vin %}
+                    <dt class="col-sm-5">VIN:</dt>
+                    <dd class="col-sm-7">{{ vehicle.vin }}</dd>
+                    {% endif %}
+
+                    {% if vehicle.license_plate %}
+                    <dt class="col-sm-5">License Plate:</dt>
+                    <dd class="col-sm-7">{{ vehicle.license_plate }}</dd>
+                    {% endif %}
+
+                    <dt class="col-sm-5">Added On:</dt>
+                    <dd class="col-sm-7">{{ vehicle.date_added|date:"M d, Y" }}</dd>
+                </dl>
+            </div>
+            <div class="card-footer bg-white">
+                <div class="d-flex justify-content-between">
+                    <a href="{% url 'vehicle-update' vehicle.pk %}" class="btn btn-primary">
+                        <i class="fas fa-edit me-1"></i> Edit
+                    </a>
+                    <a href="{% url 'vehicle-delete' vehicle.pk %}" class="btn btn-outline-danger">
+                        <i class="fas fa-trash me-1"></i> Delete
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quick Actions -->
+        <div class="card shadow mt-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="card-title mb-0">Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{% url 'maintenance-create' vehicle.id %}" class="btn btn-outline-primary">
+                        <i class="fas fa-tools me-1"></i> Log Maintenance
+                    </a>
+                    <a href="{% url 'mileage-create' vehicle.id %}" class="btn btn-outline-primary">
+                        <i class="fas fa-tachometer-alt me-1"></i> Update Mileage
+                    </a>
+                    <a href="{% url 'reminder-create' vehicle.id %}" class="btn btn-outline-primary">
+                        <i class="fas fa-bell me-1"></i> Set Reminder
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main Content Tabs -->
+    <div class="col-lg-8">
+        <div class="card shadow">
+            <div class="card-header">
+                <ul class="nav nav-tabs card-header-tabs" id="vehicleTabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="maintenance-tab" data-bs-toggle="tab" data-bs-target="#maintenance" type="button" role="tab" aria-controls="maintenance" aria-selected="true">
+                            <i class="fas fa-tools me-1"></i> Maintenance History
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="reminders-tab" data-bs-toggle="tab" data-bs-target="#reminders" type="button" role="tab" aria-controls="reminders" aria-selected="false">
+                            <i class="fas fa-bell me-1"></i> Reminders
+                        </button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="mileage-tab" data-bs-toggle="tab" data-bs-target="#mileage" type="button" role="tab" aria-controls="mileage" aria-selected="false">
+                            <i class="fas fa-tachometer-alt me-1"></i> Mileage History
+                        </button>
+                    </li>
+                </ul>
+            </div>
+            <div class="card-body">
+                <div class="tab-content" id="vehicleTabsContent">
+                    <!-- Maintenance History Tab -->
+                    <div class="tab-pane fade show active" id="maintenance" role="tabpanel" aria-labelledby="maintenance-tab">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">Maintenance Records</h5>
+                            <a href="{% url 'maintenance-create' vehicle.id %}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-plus-circle me-1"></i> Add Record
+                            </a>
+                        </div>
+
+                        {% if maintenance_records %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Service</th>
+                                            <th>Mileage</th>
+                                            <th>Cost</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for record in maintenance_records %}
+                                        <tr>
+                                            <td>{{ record.service_date }}</td>
+                                            <td>{{ record.category.name }}</td>
+                                            <td>{{ record.mileage_at_service }}</td>
+                                            <td>${{ record.cost }}</td>
+                                            <td>
+                                                <a href="{% url 'maintenance-detail' record.pk %}" class="btn btn-sm btn-outline-primary">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4">
+                                <p class="mb-3">No maintenance records yet.</p>
+                                <a href="{% url 'maintenance-create' vehicle.id %}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-plus-circle me-1"></i> Add Service Record
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Reminders Tab -->
+                    <div class="tab-pane fade" id="reminders" role="tabpanel" aria-labelledby="reminders-tab">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">Maintenance Reminders</h5>
+                            <a href="{% url 'reminder-create' vehicle.id %}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-plus-circle me-1"></i> Add Reminder
+                            </a>
+                        </div>
+
+                        {% if reminders %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Service</th>
+                                            <th>Due Date</th>
+                                            <th>Due Mileage</th>
+                                            <th>Status</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for reminder in reminders %}
+                                        <tr class="status-{{ reminder.status }}">
+                                            <td>{{ reminder.category.name }}</td>
+                                            <td>{% if reminder.due_date %}{{ reminder.due_date }}{% else %}--{% endif %}</td>
+                                            <td>{% if reminder.due_mileage %}{{ reminder.due_mileage }}{% else %}--{% endif %}</td>
+                                            <td>
+                                                {% if reminder.status == 'overdue' %}
+                                                    <span class="badge bg-danger">Overdue</span>
+                                                {% elif reminder.status == 'due_soon' %}
+                                                    <span class="badge bg-warning text-dark">Due Soon</span>
+                                                {% elif reminder.status == 'completed' %}
+                                                    <span class="badge bg-success">Completed</span>
+                                                {% else %}
+                                                    <span class="badge bg-info">Pending</span>
+                                                {% endif %}
+                                            </td>
+                                            <td class="d-flex">
+                                                {% if reminder.status != 'completed' %}
+                                                <a href="{% url 'reminder-complete' reminder.pk %}" class="btn btn-sm btn-success me-1">
+                                                    <i class="fas fa-check"></i>
+                                                </a>
+                                                {% endif %}
+                                                <a href="{% url 'reminder-update' reminder.pk %}" class="btn btn-sm btn-outline-primary me-1">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="{% url 'reminder-delete' reminder.pk %}" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4">
+                                <p class="mb-3">No maintenance reminders set.</p>
+                                <a href="{% url 'reminder-create' vehicle.id %}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-plus-circle me-1"></i> Set First Reminder
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+
+                    <!-- Mileage History Tab -->
+                    <div class="tab-pane fade" id="mileage" role="tabpanel" aria-labelledby="mileage-tab">
+                        <div class="d-flex justify-content-between align-items-center mb-3">
+                            <h5 class="mb-0">Mileage History</h5>
+                            <a href="{% url 'mileage-create' vehicle.id %}" class="btn btn-sm btn-primary">
+                                <i class="fas fa-plus-circle me-1"></i> Add Mileage
+                            </a>
+                        </div>
+
+                        {% if mileage_records %}
+                            <div class="table-responsive">
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Mileage</th>
+                                            <th>Notes</th>
+                                            <th>Actions</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for record in mileage_records %}
+                                        <tr>
+                                            <td>{{ record.date_recorded }}</td>
+                                            <td>{{ record.mileage }} miles</td>
+                                            <td>{{ record.notes|truncatechars:50 }}</td>
+                                            <td class="d-flex">
+                                                <a href="{% url 'mileage-update' record.pk %}" class="btn btn-sm btn-outline-primary me-1">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="{% url 'mileage-delete' record.pk %}" class="btn btn-sm btn-outline-danger">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        {% else %}
+                            <div class="text-center py-4">
+                                <p class="mb-3">No mileage records yet.</p>
+                                <a href="{% url 'mileage-create' vehicle.id %}" class="btn btn-primary btn-sm">
+                                    <i class="fas fa-plus-circle me-1"></i> Add First Mileage Record
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
